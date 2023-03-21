@@ -1,4 +1,5 @@
 import Card from "../../UI/Card/Card";
+import MealItem from "../MealItem/MealItem";
 import styles from "./MealsList.module.css";
 
 const DUMMY_MEALS = [
@@ -31,7 +32,12 @@ const DUMMY_MEALS = [
 
 const MealsList = (props) => {
   const MealList = DUMMY_MEALS.map((meal) => (
-    <li key={meal.id}>{meal.name}</li>
+    <MealItem
+      description={meal.description}
+      price={meal.price}
+      key={meal.id}
+      name={meal.name}
+    />
   ));
   return (
     <section className={styles.meals}>
