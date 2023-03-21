@@ -1,5 +1,5 @@
 import React from "react";
-import headerImg from "../../../assets/sushi.jpg";
+import headerImg from "../../../assets/flat-lay-sushi.jpg";
 import HeaderCartButton from "../HeaderCartButton/HeaderCartButton";
 import styles from "./Header.module.css";
 const Header = (props) => {
