@@ -1,37 +1,32 @@
+import { useEffect, useState } from "react";
 import Card from "../../UI/Card/Card";
 import MealItem from "../MealItem/MealItem";
 import styles from "./MealsList.module.css";
 
-const DUMMY_MEALS = [
-  {
-    id: "m1",
-    name: 'Roll "Naomi"',
-    description:
-      "Philadelphia cheese, chicken fillet, masago, tomato, cucumber, sesame",
-    price: 11.99,
-  },
-  {
-    id: "m2",
-    name: "Spice in salmon",
-    description: "Rice, salmon, spicy sauce",
-    price: 3.99,
-  },
-  {
-    id: "m3",
-    name: "Sushi with eel",
-    description: "Smoked eel, unagi sauce, sesame",
-    price: 4.99,
-  },
-  {
-    id: "m4",
-    name: 'Salad "Poke with salmon"',
-    description: "Rice, salmon, cucumber, chuka, nori, tuna chips, nut sauce",
-    price: 7.99,
-  },
-];
-
 const MealsList = (props) => {
-  const MealList = DUMMY_MEALS.map((meal) => (
+  const [meals, setMeals] = useState([]);
+
+  useEffect(() => {
+    const fetchMeals = async () => {
+      const responce = await fetch(
+        "https://react-course-http-jokes-default-rtdb.firebaseio.com/meals.json"
+      );
+      const data = await responce.json();
+      const loadedMeals = [];
+      for (const key in data) {
+        loadedMeals.push({
+          id: key,
+          name: data[key].name,
+          price: data[key].price,
+          description: data[key].description,
+        });
+      }
+      setMeals(loadedMeals);
+    };
+    fetchMeals();
+  }, []);
+
+  const MealList = meals.map((meal) => (
     <MealItem
       id={meal.id}
       description={meal.description}
