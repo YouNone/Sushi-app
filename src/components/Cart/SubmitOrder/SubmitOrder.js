@@ -5,7 +5,7 @@ const SubmitOrder = (props) => {
     event.preventDefault();
   };
   return (
-    <form onSubmit={confirmOrderHandler}>
+    <form className={styles.form} onSubmit={confirmOrderHandler}>
       <div className={styles.control}>
         <label htmlFor="name">Name</label>
         <input type="text" id="name" />
@@ -18,10 +18,11 @@ const SubmitOrder = (props) => {
         <label htmlFor="address">Address</label>
         <input type="text" id="address" />
       </div>
-      <button>Submit order</button>
-      <button type="button" onClick={props.onCancel}>
-        Cancel
-      </button>
+      <div>
+        <button>Submit order</button>
+        <button type="button" onClick={props.onCancel}></button>
+      </div>
+      Cancel
     </form>
   );
 };
