@@ -1,13 +1,19 @@
-import { useContext, useState } from "react";
-import CartContext from "../../store/CartContext";
-import Modal from "../UI/Modal/Modal";
+import Modal from "../UI/Modal";
 import styles from "./Cart.module.css";
-import CartItem from "./CartItem/CartItem";
-import SubmitOrder from "./SubmitOrder/SubmitOrder";
+import { useContext, useState } from "react";
+import CartContext from "../../store/cart-context";
+import CartItem from "./CartItem";
+import SubmitOrder from "./SubmitOrder";
+import React from "react";
 
 const Cart = (props) => {
+  const [isSubmitOrderAvailable, setIsSubmitOrderAvailable] = useState(false);
+  const [isDataSubmitting, setIsDataSubmitting] = useState(false);
+  const [wasDataSendingSuccessful, setWasDataSendingSuccessful] =
+    useState(false);
+
   const cartContext = useContext(CartContext);
-  const [isSubmitOrder, setSubmitOrder] = useState(false);
+
   const totalAmount = `$${Math.abs(cartContext.totalAmount).toFixed(2)}`;
   const hasItems = cartContext.items.length > 0;
 
@@ -20,7 +26,25 @@ const Cart = (props) => {
   };
 
   const orderHandler = () => {
-    setSubmitOrder(true);
+    setIsSubmitOrderAvailable(true);
+  };
+
+  const submitOrderHandler = async (userData) => {
+    setIsDataSubmitting(true);
+
+    await fetch(
+      "https://react-course-http-jokes-default-rtdb.firebaseio.com/orders.json",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          user: userData,
+          orderedMeals: cartContext.items,
+        }),
+      }
+    );
+    setIsDataSubmitting(false);
+    setWasDataSendingSuccessful(true);
+    cartContext.clearCart();
   };
 
   const cartItems = (
@@ -41,25 +65,51 @@ const Cart = (props) => {
   const modalButtons = (
     <div className={styles.actions}>
       <button className={styles["button--alt"]} onClick={props.onHideCart}>
-        Close
+        Закрыть
       </button>
       {hasItems && (
         <button className={styles.button} onClick={orderHandler}>
-          Order
+          Заказать
         </button>
       )}
     </div>
   );
 
-  return (
-    <Modal onHideCart={props.onHideCart}>
+  const cartModalContent = (
+    <React.Fragment>
       {cartItems}
       <div className={styles.total}>
         <span>Итого</span>
         <span>{totalAmount}</span>
       </div>
-      {isSubmitOrder && <SubmitOrder onCancel={props.onHideCart} />}
-      {!isSubmitOrder && modalButtons}
+      {isSubmitOrderAvailable && (
+        <SubmitOrder
+          onSubmit={submitOrderHandler}
+          onCancel={props.onHideCart}
+        />
+      )}
+      {!isSubmitOrderAvailable && modalButtons}
+    </React.Fragment>
+  );
+
+  const dataSubmittingCartModalContent = <p>Отправка данных заказа...</p>;
+
+  const dataWasSubmittedCartModalContent = (
+    <React.Fragment>
+      <p>Ваш заказ успешно отправлен!</p>
+      <div className={styles.actions}>
+        <button className={styles["button--alt"]} onClick={props.onHideCart}>
+          Закрыть
+        </button>
+      </div>
+    </React.Fragment>
+  );
+
+  return (
+    <Modal onHideCart={props.onHideCart}>
+      {!isDataSubmitting && !wasDataSendingSuccessful && cartModalContent}
+      {isDataSubmitting && dataSubmittingCartModalContent}
+      {wasDataSendingSuccessful && dataWasSubmittedCartModalContent}
     </Modal>
   );
 };
